@@ -1,0 +1,16 @@
+{
+    "name": "gorden/curd",
+    "description": "CURD",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Gorden\\Curd\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "gorden"
+        }
+    ],
+    "require": {}
+}
