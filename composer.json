@@ -13,6 +13,11 @@
         }
     ],
     "require": {
-        "php": ">=7.2"
+        "php": ">=7.2",
+        "workerman/webman-framework": "^1.5.0",
+        "illuminate/database": "^8.83",
+        "illuminate/pagination": "^8.83",
+        "illuminate/events": "^8.83",
+        "illuminate/redis": "^8.83"
     }
 }
