@@ -12,5 +12,7 @@
             "name": "gorden"
         }
     ],
-    "require": {}
+    "require": {
+        "php": ">=7.2"
+    }
 }
