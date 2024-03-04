@@ -1,139 +1,60 @@
 <?php
 
-namespace Gorden\Curd;
+namespace Gorden\Curd\Controller;
 
+use Gorden\Curd\Common\Util;
+use Gorden\Curd\Exception\CurdException;
+use support\Model;
 use support\Request;
 use support\Response;
+use think\Validate;
 
-class Base
+class BaseController
 {
+    /**
+     * 不需要登录的方法
+     * @var string[]
+     */
+    protected $noNeedLogin = ['login', 'captcha'];
+
+    /**
+     * 不需要鉴权的方法
+     * @var string[]
+     */
+    protected $noNeedAuth = ['info'];
+
     /**
      * @var Model
      */
     protected $model = null;
 
     /**
-     * 数据限制
-     * 例如当$dataLimit='personal'时将只返回当前管理员的数据
-     * @var string
+     * 验证场景
      */
-    protected $dataLimit = null;
+    protected $scene = null;
 
     /**
-     * 数据限制字段
+     * 数据验证开关
      */
-    protected $dataLimitField = 'user_id';
-
-    /**
-     * 是否开启数据验证
-     */
-    protected $openValidate = false;
-
-    /**
-     * 验证类
-     */
-    protected $validateClass = '';
-
-    /**
-     * 查询
-     * @param Request $request
-     * @return Response
-     * @throws BusinessException
-     */
-    public function select(Request $request): Response
-    {
-        [$where, $format, $limit, $field, $order] = $this->selectInput($request);
-        $query = $this->doSelect($where, $field, $order);
-        return $this->doFormat($query, $format, $limit);
-    }
-
-    /**
-     * 添加
-     * @param Request $request
-     * @return Response
-     * @throws BusinessException
-     */
-    public function insert(Request $request): Response
-    {
-        if ($this->validate && !$this->validateClass->scene('add')->check($request->post())) {
-            return json_fail($this->validateClass->getError());
-        }
-
-        $data = $this->insertInput($request);
-        $this->doInsert($data);
-        return json_success('success');
-    }
-
-    /**
-     * 更新
-     * @param Request $request
-     * @return Response
-     * @throws BusinessException
-     */
-    public function update(Request $request): Response
-    {
-        if ($this->validate && !$this->validateClass->scene('update')->check($request->post())) {
-            return json_fail($this->validateClass->getError());
-        }
-
-        [$id, $data] = $this->updateInput($request);
-        $this->doUpdate($id, $data);
-        return json_success('success');
-    }
-
-    /**
-     * 删除
-     * @param Request $request
-     * @return Response
-     * @throws BusinessException
-     */
-    public function delete(Request $request): Response
-    {
-        $ids = $this->deleteInput($request);
-        $this->doDelete($ids);
-        return json_success('success');
-    }
-
-    /**
-     * @Desc 软删除
-     * @Author Gorden
-     * @Date 2024/2/26 9:27
-     *
-     * @param Request $request
-     * @return Response
-     * @throws BusinessException
-     */
-    public function softDelete(Request $request): Response
-    {
-        $ids = $this->deleteInput($request);
-        $this->doSoftDelete($ids, ['is_del' => 1]);
-
-        return json_success('success');
-    }
+    protected $validateSeitch = null;
 
     /**
      * 查询前置
      * @param Request $request
      * @return array
-     * @throws BusinessException
      */
     protected function selectInput(Request $request): array
     {
         $field = $request->get('field');
-        $order = $request->get('order', 'asc');
+        $order = $request->get('order', 'desc');
         $format = $request->get('format', 'normal');
         $limit = (int)$request->get('limit', $format === 'tree' ? 1000 : 10);
         $limit = $limit <= 0 ? 10 : $limit;
-        $order = $order === 'asc' ? 'asc' : 'desc';
         $where = $request->get();
         $page = (int)$request->get('page');
         $page = $page > 0 ? $page : 1;
-        $table = config('database.connections.mysql.prefix') . $this->model->getTable();
-
+        $table = $this->getTableName($this->model->getTable());
         $allow_column = Util::db()->select("desc `$table`");
-        if (!$allow_column) {
-            throw new BusinessException('表不存在');
-        }
         $allow_column = array_column($allow_column, 'Field', 'Field');
         if (!in_array($field, $allow_column)) {
             $field = null;
@@ -146,15 +67,7 @@ class Base
                 unset($where[$column]);
             }
         }
-        // 按照数据限制字段返回数据
-        if ($this->dataLimit === 'personal') {
-            $where[$this->dataLimitField] = JwtToken::getCurrentId();
-        } elseif ($this->dataLimit === 'auth') {
-            $primary_key = $this->model->getKeyName();
-            if (!Auth::isSupperAdmin() && (!isset($where[$primary_key]) || $this->dataLimitField != $primary_key)) {
-                $where[$this->dataLimitField] = ['in', Auth::getScopeAdminIds(true)];
-            }
-        }
+
         return [$where, $format, $limit, $field, $order, $page];
     }
 
@@ -163,9 +76,9 @@ class Base
      * @param array $where
      * @param string|null $field
      * @param string $order
-     * @return EloquentBuilder|QueryBuilder|Model
+     * @return mixed
      */
-    protected function doSelect(array $where, string $field = null, string $order = 'desc')
+    protected function specifyConditions(array $where, string $field = null, string $order = 'desc')
     {
         $model = $this->model;
         foreach ($where as $column => $value) {
@@ -210,7 +123,7 @@ class Base
      * @param $limit
      * @return Response
      */
-    protected function doFormat($query, $format, $limit): Response
+    protected function doSelect($query, $format, $limit): Response
     {
         $methods = [
             'select' => 'formatSelect',
@@ -229,45 +142,20 @@ class Base
     }
 
     /**
-     * 插入前置方法
-     * @param Request $request
-     * @return array
-     * @throws BusinessException
-     */
-    protected function insertInput(Request $request): array
-    {
-        $data = $this->inputFilter($request->post());
-        $password_filed = 'password';
-        if (isset($data[$password_filed])) {
-            $data[$password_filed] = Util::passwordHash($data[$password_filed]);
-        }
-
-        if (!Auth::isSupperAdmin() && $this->dataLimit) {
-            if (!empty($data[$this->dataLimitField])) {
-                $admin_id = $data[$this->dataLimitField];
-                if (!in_array($admin_id, Auth::getScopeAdminIds(true))) {
-                    throw new BusinessException('无数据权限');
-                }
-            }
-        }
-        return $data;
-    }
-
-    /**
      * 执行插入
      * @param array $data
      * @return mixed|null
      */
     protected function doInsert(array $data)
     {
-        $primary_key = $this->model->getKeyName();
-        $model_class = get_class($this->model);
-        $model = new $model_class;
+        $primaryKey = $this->model->getKeyName();
         foreach ($data as $key => $val) {
-            $model->{$key} = $val;
+            $this->model->{$key} = $val;
         }
-        $model->save();
-        return $primary_key ? $model->$primary_key : null;
+        $this->model->save();
+        $primaryValue = $primaryKey ? $this->model->$primary_key : null;
+
+        return Util::jsonSuccess('success', [$primaryKey => $primaryValue]);
     }
 
     /**
@@ -285,25 +173,14 @@ class Base
         if (!$model) {
             throw new BusinessException('记录不存在', 2);
         }
-        if (!Auth::isSupperAdmin() && $this->dataLimit) {
-            $scopeAdminIds = Auth::getScopeAdminIds(true);
-            $admin_ids = [
-                $data[$this->dataLimitField] ?? false, // 检查要更新的数据admin_id是否是有权限的值
-                $model->{$this->dataLimitField} ?? false // 检查要更新的记录的admin_id是否有权限
-            ];
-            foreach ($admin_ids as $admin_id) {
-                if ($admin_id && !in_array($admin_id, $scopeAdminIds)) {
-                    throw new BusinessException('无数据权限');
-                }
-            }
-        }
-        $password_filed = 'password';
-        if (isset($data[$password_filed])) {
+
+        $passwordFiled = 'password';
+        if (isset($data[$passwordFiled])) {
             // 密码为空，则不更新密码
-            if ($data[$password_filed] === '') {
-                unset($data[$password_filed]);
+            if ($data[$passwordFiled] === '') {
+                unset($data[$passwordFiled]);
             } else {
-                $data[$password_filed] = Util::passwordHash($data[$password_filed]);
+                $data[$passwordFiled] = Util::passwordHash($data[$passwordFiled]);
             }
         }
         unset($data[$primary_key]);
@@ -329,15 +206,12 @@ class Base
      * 对用户输入表单过滤
      * @param array $data
      * @return array
-     * @throws BusinessException
+     * @throws CurdException
      */
     protected function inputFilter(array $data): array
     {
-        $table = config('database.connections.mysql.prefix') . $this->model->getTable();
+        $table = $this->getTableName($this->model->getTable());
         $allow_column = $this->model->getConnection()->select("desc `$table`");
-        if (!$allow_column) {
-            throw new BusinessException('表不存在', 2);
-        }
         $columns = array_column($allow_column, 'Type', 'Field');
         foreach ($data as $col => $item) {
             if (!isset($columns[$col])) {
@@ -395,24 +269,6 @@ class Base
         }
         $primary_key = $this->model->getKeyName();
         $this->model->whereIn($primary_key, $ids)->delete();
-    }
-
-    /**
-     * @Desc 执行软删除
-     * @Author Gorden
-     * @Date 2024/2/26 9:27
-     *
-     * @param array $ids
-     * @return void
-     */
-    protected function doSoftDelete(array $ids, $data)
-    {
-        if (!$ids) {
-            return;
-        }
-
-        $primary_key = $this->model->getKeyName();
-        $this->model->whereIn($primary_key, $ids)->update($data);
     }
 
     /**
@@ -484,9 +340,34 @@ class Base
         return $items;
     }
 
-    protected function checkValidate($scene = '', $data = [])
+    /**
+     * @Desc 返回验证器开关状态
+     * @Author Gorden
+     *
+     * @return array|mixed|null
+     */
+    public function validateSwitch()
     {
+        if (is_null($this->validateSeitch)) {
+            return config('plugin.gorden.curd.app.curd.open_validate');
+        }
 
-        return config('plugin.gorden.curd.open_validate');
+        return $this->validateSeitch;
+    }
+
+    protected function validateObject()
+    {
+        return new Validate();
+    }
+
+    /**
+     * @Desc 完整表名
+     *
+     * @param $table
+     * @return string
+     */
+    private function getTableName($table)
+    {
+        return config('database.connections.mysql.prefix') . $table;
     }
 }
