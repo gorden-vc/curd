@@ -4,16 +4,18 @@
  * Date: 2021/7/8
  * Time: 10:49 PM
  */
+
 namespace Gorden\Curd\Template\Impl;
 
 use Gorden\Curd\Extend\Utils;
 use Gorden\Curd\Template\IAutoMake;
 use support\Db;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ControllerAutoMake implements IAutoMake
 {
-    public function check($controller, $path)
+    public function check($controller, $path, OutputInterface $output)
     {
         !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
@@ -23,10 +25,9 @@ class ControllerAutoMake implements IAutoMake
         if (!is_dir(base_path() . $path . DS . 'controller')) {
             mkdir(base_path() . $path . DS . 'controller', 0755, true);
         }
-        
+
         if (file_exists($controllerFilePath)) {
-//            $output = new Output();
-//            $output->error("$controller.php已经存在");
+            $output->writeln("$controller.php已经存在");
             exit;
         }
     }
@@ -43,10 +44,11 @@ class ControllerAutoMake implements IAutoMake
 
         $prefix = config('database.connections.mysql.prefix');
         $column = Db::query('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
+
         $pk = '';
         foreach ($column as $vo) {
-            if ($vo['Key'] == 'PRI') {
-                $pk = $vo['Field'];
+            if ($vo->Key == 'PRI') {
+                $pk = $vo->Field;
                 break;
             }
         }

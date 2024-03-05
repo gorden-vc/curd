@@ -8,6 +8,7 @@
 namespace Gorden\Curd\Strategy;
 
 use Gorden\Curd\Template\IAutoMake;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class AutoMakeStrategy
 {
@@ -18,9 +19,9 @@ class AutoMakeStrategy
         $this->strategy = $obj;
     }
 
-    public function executeStrategy($flag, $path, $other)
+    public function executeStrategy($flag, $path, $other, OutputInterface $output)
     {
-        $this->strategy->check($flag, $path);
+        $this->strategy->check($flag, $path, $output);
         $this->strategy->make($flag, $path, $other);
     }
 }

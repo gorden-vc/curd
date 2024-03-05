@@ -7,9 +7,11 @@
 
 namespace Gorden\Curd\Template;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 interface IAutoMake
 {
-    public function check($flag, $path);
+    public function check($flag, $path, OutputInterface $output);
 
     public function make($flag, $path, $other);
 }

@@ -11,14 +11,16 @@ use Gorden\Curd\Extend\Utils;
 use Gorden\Curd\Template\IAutoMake;
 use support\Db;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 class ModelAutoMake implements IAutoMake
 {
-    public function check($table, $path)
+    public function check($table, $path, OutputInterface $output)
     {
         !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
-        $modelName = Utils::camelize($table);
+        $modelName = ucfirst(Utils::camelize($table));
         $modelFilePath = base_path() . $path . DS . 'model' . DS . $modelName . '.php';
 
         if (!is_dir(base_path() . $path . DS . 'model')) {
@@ -26,8 +28,7 @@ class ModelAutoMake implements IAutoMake
         }
 
         if (file_exists($modelFilePath)) {
-//            $output = new Output();
-//            $output->error("$modelName.php已经存在");
+            $output->write("$modelName.php已经存在");
             exit;
         }
     }
@@ -45,8 +46,8 @@ class ModelAutoMake implements IAutoMake
         $column = Db::query('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
         $pk = '';
         foreach ($column as $vo) {
-            if ($vo['Key'] == 'PRI') {
-                $pk = $vo['Field'];
+            if ($vo->Key == 'PRI') {
+                $pk = $vo->Field;
                 break;
             }
         }

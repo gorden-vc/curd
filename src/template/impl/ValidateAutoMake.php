@@ -4,24 +4,24 @@ namespace Gorden\Curd\Template\Impl;
 
 use Gorden\Curd\Extend\Utils;
 use Gorden\Curd\Template\IAutoMake;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Component\Console\Output\Output;
 use support\Db;
 
 class ValidateAutoMake implements IAutoMake
 {
-    public function check($table, $path)
+    public function check($table, $path, OutputInterface $output)
     {
         $validateName = Utils::camelize($table) . 'Validate';
-        $validateFilePath = App::getAppPath() . $path . DS . 'validate' . DS . $validateName . '.php';
+        $validateFilePath = base_path() . $path . DS . 'validate' . DS . $validateName . '.php';
 
-        if (!is_dir(App::getAppPath() . $path . DS . 'validate')) {
-            mkdir(App::getAppPath() . $path . DS . 'validate', 0755, true);
+        if (!is_dir(base_path() . $path . DS . 'validate')) {
+            mkdir(base_path() . $path . DS . 'validate', 0755, true);
         }
 
         if (file_exists($validateFilePath)) {
-//            $output = new Output();
-//            $output->error("$validateName.php已经存在");
+            $output->write("$validateName.php22已经存在");
             exit;
         }
     }
@@ -52,6 +52,6 @@ class ValidateAutoMake implements IAutoMake
         $tplContent = str_replace('<rule>', '' . $ruleArr, $tplContent);
         $tplContent = str_replace('<attributes>', $attributesArr, $tplContent);
 
-        file_put_contents(App::getAppPath() . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent);
+        file_put_contents(base_path() . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent);
     }
 }

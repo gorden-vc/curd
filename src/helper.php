@@ -14,8 +14,9 @@
  * @return array
  */
 if (!function_exists('dataReturn')) {
-    
-    function dataReturn($code, $msg = 'success', $data = []) {
+
+    function dataReturn($code, $msg = 'success', $data = [])
+    {
 
         return ['code' => $code, 'data' => $data, 'msg' => $msg];
     }
@@ -29,8 +30,9 @@ if (!function_exists('dataReturn')) {
  * @return \think\response\Json
  */
 if (!function_exists('jsonReturn')) {
-    
-    function jsonReturn($code, $msg = 'success', $data = []) {
+
+    function jsonReturn($code, $msg = 'success', $data = [])
+    {
 
         return json(['code' => $code, 'data' => $data, 'msg' => $msg]);
     }
@@ -43,11 +45,30 @@ if (!function_exists('jsonReturn')) {
  */
 if (!function_exists('pageReturn')) {
 
-    function pageReturn($list) {
+    function pageReturn($list)
+    {
         if (0 == $list['code']) {
             return ['code' => 0, 'msg' => 'ok', 'count' => $list['data']->total(), 'data' => $list['data']->all()];
         }
 
         return ['code' => 0, 'msg' => 'ok', 'count' => 0, 'data' => []];
+    }
+}
+
+/**
+ * 下划线转驼峰
+ */
+if (!function_exists('toCamelCase')) {
+    function toCamelCase($str)
+    {
+        $array = explode('_', $str);
+        $result = $array[0];
+        $len = count($array);
+        if ($len > 1) {
+            for ($i = 1; $i < $len; $i++) {
+                $result .= ucfirst($array[$i]);
+            }
+        }
+        return $result;
     }
 }
