@@ -2,6 +2,7 @@
 
 namespace Gorden\Curd\Controller;
 
+use support\exception\BusinessException;
 use Gorden\Curd\Common\Util;
 use Gorden\Curd\Exception\CurdException;
 use support\Model;
@@ -27,6 +28,11 @@ class BaseController
      * @var Model
      */
     protected $model = null;
+
+    /**
+     * @var Validate
+     */
+    protected $validateObj = null;
 
     /**
      * 验证场景
@@ -155,7 +161,7 @@ class BaseController
         $this->model->save();
         $primaryValue = $primaryKey ? $this->model->$primary_key : null;
 
-        return Util::jsonSuccess('success', [$primaryKey => $primaryValue]);
+        return json_success('success', [$primaryKey => $primaryValue]);
     }
 
     /**
@@ -206,7 +212,6 @@ class BaseController
      * 对用户输入表单过滤
      * @param array $data
      * @return array
-     * @throws CurdException
      */
     protected function inputFilter(array $data): array
     {
@@ -248,12 +253,6 @@ class BaseController
             throw new BusinessException('该表无主键，不支持删除');
         }
         $ids = (array)$request->post($primary_key, []);
-        if (!Auth::isSupperAdmin() && $this->dataLimit) {
-            $admin_ids = $this->model->where($primary_key, $ids)->pluck($this->dataLimitField)->toArray();
-            if (array_diff($admin_ids, Auth::getScopeAdminIds(true))) {
-                throw new BusinessException('无数据权限');
-            }
-        }
         return $ids;
     }
 
@@ -265,7 +264,7 @@ class BaseController
     protected function doDelete(array $ids)
     {
         if (!$ids) {
-            return;
+            throw new BusinessException('数据不存在~');
         }
         $primary_key = $this->model->getKeyName();
         $this->model->whereIn($primary_key, $ids)->delete();
@@ -327,7 +326,7 @@ class BaseController
      */
     protected function formatNormal($items, $total): Response
     {
-        return json(['code' => 0, 'msg' => 'success', 'count' => $total, 'data' => $items]);
+        return json_success('success', ['count' => $total, 'data' => $items]);
     }
 
     /**
@@ -353,11 +352,6 @@ class BaseController
         }
 
         return $this->validateSeitch;
-    }
-
-    protected function validateObject()
-    {
-        return new Validate();
     }
 
     /**

@@ -14,16 +14,16 @@ class ValidateAutoMake implements IAutoMake
     public function check($table, $path, OutputInterface $output)
     {
         $validateName = Utils::camelize($table) . 'Validate';
-        $validateFilePath = base_path() . $path . DS . 'validate' . DS . $validateName . '.php';
+        $validateFilePath = app_path() . $path . DS . 'validate' . DS . $validateName . '.php';
 
-        if (!is_dir(base_path() . $path . DS . 'validate')) {
-            mkdir(base_path() . $path . DS . 'validate', 0755, true);
+        if (!is_dir(app_path() . $path . DS . 'validate')) {
+            mkdir(app_path() . $path . DS . 'validate', 0755, true);
         }
 
-        if (file_exists($validateFilePath)) {
-            $output->write("$validateName.php22已经存在");
-            exit;
-        }
+//        if (file_exists($validateFilePath)) {
+//            $output->write("$validateName.php已经存在");
+//            exit;
+//        }
     }
 
     public function make($table, $path, $other)
@@ -36,22 +36,24 @@ class ValidateAutoMake implements IAutoMake
         $namespace = empty($path) ? '\\' : '\\' . $path . '\\';
 
         $prefix = config('database.connections.mysql.prefix');
-        $column = Db::query('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
+        $column = Db::select('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
         $rule = [];
-        $attributes = [];
+        $scene = [];
         foreach ($column as $vo) {
-            $rule[$vo['Field']] = 'require';
-            $attributes[$vo['Field']] = $vo['Comment'];
+            $rule[$vo->Field] = $vo->Null == 'NO' ? 'require' : '';
+            if ($vo->Key != 'PRI'){
+                $scene[] = $vo->Field;
+            }
         }
 
         $ruleArr = VarExporter::export($rule);
-        $attributesArr = VarExporter::export($attributes);
+        $sceneArr = VarExporter::export($scene);
 
         $tplContent = str_replace('<namespace>', $namespace, $tplContent);
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<rule>', '' . $ruleArr, $tplContent);
-        $tplContent = str_replace('<attributes>', $attributesArr, $tplContent);
+        $tplContent = str_replace('<scene>', $sceneArr, $tplContent);
 
-        file_put_contents(base_path() . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent);
+        file_put_contents(app_path() . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent);
     }
 }

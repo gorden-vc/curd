@@ -21,16 +21,16 @@ class ModelAutoMake implements IAutoMake
         !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
         $modelName = ucfirst(Utils::camelize($table));
-        $modelFilePath = base_path() . $path . DS . 'model' . DS . $modelName . '.php';
+        $modelFilePath = app_path() . $path . DS . 'model' . DS . $modelName . '.php';
 
-        if (!is_dir(base_path() . $path . DS . 'model')) {
-            mkdir(base_path() . $path . DS . 'model', 0755, true);
+        if (!is_dir(app_path() . $path . DS . 'model')) {
+            mkdir(app_path() . $path . DS . 'model', 0755, true);
         }
 
-        if (file_exists($modelFilePath)) {
-            $output->write("$modelName.php已经存在");
-            exit;
-        }
+//        if (file_exists($modelFilePath)) {
+//            $output->write("$modelName.php已经存在");
+//            exit;
+//        }
     }
 
     public function make($table, $path, $other)
@@ -43,7 +43,7 @@ class ModelAutoMake implements IAutoMake
         $namespace = empty($path) ? '\\' : '\\' . $path . '\\';
 
         $prefix = config('database.connections.mysql.prefix');
-        $column = Db::query('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
+        $column = Db::select('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
         $pk = '';
         foreach ($column as $vo) {
             if ($vo->Key == 'PRI') {
@@ -56,6 +56,7 @@ class ModelAutoMake implements IAutoMake
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
-        file_put_contents(base_path() . $path . DS . 'model' . DS . $model . '.php', $tplContent);
+        dd(app_path() . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent);
+        file_put_contents(app_path() . $path . DS . 'model' . DS . $model . '.php', $tplContent);
     }
 }

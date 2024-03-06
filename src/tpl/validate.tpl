@@ -2,11 +2,15 @@
 
 namespace app<namespace>validate;
 
-use nickbai\tp6curd\extend\ExtendValidate;
+use think\Validate;
 
-class <model>Validate extends ExtendValidate
+class <model>Validate extends Validate
 {
     protected $rule = <rule>;
+    protected $message = [];
 
-    protected $attributes = <attributes>;
+    protected $scene = [
+        'insert' => <scene>,
+        'update' => <scene>
+    ];
 }

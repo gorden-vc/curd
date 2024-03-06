@@ -20,16 +20,16 @@ class ControllerAutoMake implements IAutoMake
         !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
         $controller = ucfirst($controller);
-        $controllerFilePath = base_path() . $path . DS . 'controller' . DS . $controller . '.php';
+        $controllerFilePath = app_path() . $path . DS . 'controller' . DS . $controller . '.php';
 
-        if (!is_dir(base_path() . $path . DS . 'controller')) {
-            mkdir(base_path() . $path . DS . 'controller', 0755, true);
+        if (!is_dir(app_path() . $path . DS . 'controller')) {
+            mkdir(app_path() . $path . DS . 'controller', 0755, true);
         }
 
-        if (file_exists($controllerFilePath)) {
-            $output->writeln("$controller.php已经存在");
-            exit;
-        }
+//        if (file_exists($controllerFilePath)) {
+//            $output->writeln("$controller.php已经存在");
+//            exit;
+//        }
     }
 
     public function make($controller, $path, $table)
@@ -43,7 +43,7 @@ class ControllerAutoMake implements IAutoMake
         $namespace = empty($path) ? '\\' : '\\' . $path . '\\';
 
         $prefix = config('database.connections.mysql.prefix');
-        $column = Db::query('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
+        $column = Db::select('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
 
         $pk = '';
         foreach ($column as $vo) {
@@ -58,17 +58,17 @@ class ControllerAutoMake implements IAutoMake
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
-        file_put_contents(base_path() . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent);
+        file_put_contents(app_path() . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent);
 
         // 检测base是否存在
-        if (!file_exists(base_path() . $filePath . DS . 'controller' . DS . 'Base.php')) {
-
-            $controllerTpl = dirname(dirname(__DIR__)) . '/tpl/baseController.tpl';
-            $tplContent = file_get_contents($controllerTpl);
-
-            $tplContent = str_replace('<namespace>', $namespace, $tplContent);
-
-            file_put_contents(base_path() . $filePath . DS . 'controller' . DS . 'Base.php', $tplContent);
-        }
+//        if (!file_exists(base_path() . $filePath . DS . 'controller' . DS . 'Base.php')) {
+//
+//            $controllerTpl = dirname(dirname(__DIR__)) . '/tpl/baseController.tpl';
+//            $tplContent = file_get_contents($controllerTpl);
+//
+//            $tplContent = str_replace('<namespace>', $namespace, $tplContent);
+//
+//            file_put_contents(base_path() . $filePath . DS . 'controller' . DS . 'Base.php', $tplContent);
+//        }
     }
 }

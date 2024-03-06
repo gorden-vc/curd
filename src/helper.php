@@ -1,43 +1,6 @@
 <?php
 
-\think\Console::starting(function (\think\Console $console) {
-    $console->addCommands([
-        'curd' => '\\nickbai\\tp6curd\\command\\Curd'
-    ]);
-});
-
-/**
- * 模型内统一数据返回
- * @param $code
- * @param string $msg
- * @param array $data
- * @return array
- */
-if (!function_exists('dataReturn')) {
-
-    function dataReturn($code, $msg = 'success', $data = [])
-    {
-
-        return ['code' => $code, 'data' => $data, 'msg' => $msg];
-    }
-}
-
-/**
- * 统一返回json数据
- * @param $code
- * @param string $msg
- * @param array $data
- * @return \think\response\Json
- */
-if (!function_exists('jsonReturn')) {
-
-    function jsonReturn($code, $msg = 'success', $data = [])
-    {
-
-        return json(['code' => $code, 'data' => $data, 'msg' => $msg]);
-    }
-}
-
+use support\Response;
 /**
  * 统一分页返回
  * @param $list
@@ -70,5 +33,39 @@ if (!function_exists('toCamelCase')) {
             }
         }
         return $result;
+    }
+}
+
+/**
+ * 正常数据返回
+ */
+if (!function_exists('json_success')) {
+
+    function json_success($message, $data = '', $options = JSON_UNESCAPED_UNICODE)
+    {
+        $return = [
+            'code' => 200,
+            'message' => $message,
+            'data' => $data,
+        ];
+
+        return new Response(200, ['Content-Type' => 'application/json'], json_encode($return, $options));
+    }
+}
+
+/**
+ * 错误数据返回
+ */
+if (!function_exists('json_fail')) {
+
+    function json_fail($message, $options = JSON_UNESCAPED_UNICODE)
+    {
+        $return = [
+            'code' => 0,
+            'message' => $message,
+            'data' => ''
+        ];
+
+        return new Response(200, ['Content-Type' => 'application/json'], json_encode($return, $options));
     }
 }
