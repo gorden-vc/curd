@@ -12,7 +12,7 @@ class Install
      */
     protected static $pathRelation = array(
         'config/plugin/gorden/curd' => 'config/plugin/gorden/curd',
-        'app/command'=>'app/command'
+        'command'=>'app/command'
     );
 
     /**
