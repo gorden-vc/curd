@@ -161,7 +161,7 @@ class BaseController
         $this->model->save();
         $primaryValue = $primaryKey ? $this->model->$primary_key : null;
 
-        return json_success('success', [$primaryKey => $primaryValue]);
+        return Util::jsonSuccess('success', [$primaryKey => $primaryValue]);
     }
 
     /**
@@ -287,7 +287,7 @@ class BaseController
             ];
         }
         $tree = new Tree($format_items);
-        return json_success('success', $tree->getTree());
+        return Util::jsonSuccess('success', $tree->getTree());
     }
 
     /**
@@ -298,7 +298,7 @@ class BaseController
     protected function formatTableTree($items): Response
     {
         $tree = new Tree($items);
-        return json_success('success', $tree->getTree());
+        return Util::jsonSuccess('success', $tree->getTree());
     }
 
     /**
@@ -315,7 +315,7 @@ class BaseController
                 'value' => $item->id
             ];
         }
-        return json_success('success', $formatted_items);
+        return Util::jsonSuccess('success', $formatted_items);
     }
 
     /**
@@ -326,7 +326,7 @@ class BaseController
      */
     protected function formatNormal($items, $total): Response
     {
-        return json_success('success', ['count' => $total, 'data' => $items]);
+        return Util::jsonSuccess('success', ['count' => $total, 'data' => $items]);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Gorden\Curd\Controller;
 
 use support\Request;
 use support\Response;
+use Gorden\Curd\Common\Util;
 use support\exception\BusinessException;
 
 class CurdController extends BaseController
@@ -21,7 +22,7 @@ class CurdController extends BaseController
             $query = $this->specifyConditions($where, $field, $order);
             return $this->doSelect($query, $format, $limit);
         } catch (\Exception $e) {
-            return json_fail(config('app.debug', false) ? $e->getMessage() : "查询异常~");
+            return Util::jsonFail(config('app.debug', false) ? $e->getMessage() : "查询异常~");
         }
     }
 
@@ -42,11 +43,11 @@ class CurdController extends BaseController
 
             return $this->doInsert($data);
         } catch (\PDOException $PDOException) {
-            return json_fail(config('app.debug', false) ? $PDOException->getMessage() : '数据写入失败~');
+            return Util::jsonFail(config('app.debug', false) ? $PDOException->getMessage() : '数据写入失败~');
         } catch (BusinessException $e) {
-            return json_fail($e->getMessage());
+            return Util::jsonFail($e->getMessage());
         } catch (\Exception $e) {
-            return json_fail(config('app.debug', false) ? $e->getMessage() : '数据写入失败~');
+            return Util::jsonFail(config('app.debug', false) ? $e->getMessage() : '数据写入失败~');
         }
     }
 
@@ -61,17 +62,17 @@ class CurdController extends BaseController
         try {
             $scene = $this->scene ?? 'update';
             if ($this->validateSeitch && !$this->validate()->scene($scene)->check($request->post())) {
-                return json_fail($this->validateClass->getError());
+                return Util::jsonFail($this->validateClass->getError());
             }
             [$id, $data] = $this->updateInput($request);
             $this->doUpdate($id, $data);
             return json_success('success');
         } catch (\PDOException $PDOException) {
-            return json_fail(config('app.debug', false) ? $PDOException->getMessage() : '数据写入失败~');
+            return Util::jsonFail(config('app.debug', false) ? $PDOException->getMessage() : '数据写入失败~');
         } catch (BusinessException $e) {
-            return json_fail($e->getMessage());
+            return Util::jsonFail($e->getMessage());
         } catch (\Exception $e) {
-            return json_fail(config('app.debug', false) ? $e->getMessage() : '数据写入失败~');
+            return Util::jsonFail(config('app.debug', false) ? $e->getMessage() : '数据写入失败~');
         }
     }
 
@@ -88,11 +89,11 @@ class CurdController extends BaseController
             $this->doDelete($ids);
             return json_success('success');
         } catch (\PDOException $PDOException) {
-            return json_fail(config('app.debug', false) ? $PDOException->getMessage() : '数据写入失败~');
+            return Util::jsonFail(config('app.debug', false) ? $PDOException->getMessage() : '数据写入失败~');
         } catch (BusinessException $e) {
-            return json_fail($e->getMessage());
+            return Util::jsonFail($e->getMessage());
         } catch (\Exception $e) {
-            return json_fail(config('app.debug', false) ? $e->getMessage() : '数据写入失败~');
+            return Util::jsonFail(config('app.debug', false) ? $e->getMessage() : '数据写入失败~');
         }
     }
 }
