@@ -26,7 +26,7 @@ class ValidateAutoMake implements IAutoMake
         }
     }
 
-    public function make($table, $modelPath, $controllerPath, $validatePath, $other)
+    public function make($table, $modelPath, $controllerPath, $validatePath, $other, OutputInterface $output)
     {
         $validateTpl = dirname(dirname(__DIR__)) . '/tpl/validate.tpl';
         $tplContent = file_get_contents($validateTpl);
@@ -54,6 +54,10 @@ class ValidateAutoMake implements IAutoMake
         $tplContent = str_replace('<rule>', '' . $ruleArr, $tplContent);
         $tplContent = str_replace('<scene>', $sceneArr, $tplContent);
 
-        file_put_contents(app_path('/') . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent);
+        if (file_put_contents(app_path('/') . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent)) {
+            $output->writeln("Generate app\{$namespace}\\validate\{$model}Validate.php Success");
+        } else {
+            $output->writeln("Generate app\{$namespace}\\validate\{$model}Validate.php Fail");
+        }
     }
 }

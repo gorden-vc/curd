@@ -33,7 +33,7 @@ class ModelAutoMake implements IAutoMake
         }
     }
 
-    public function make($table, $modelPath, $controllerPath, $validatePath, $other)
+    public function make($table, $modelPath, $controllerPath, $validatePath, $other, OutputInterface $output)
     {
         $controllerTpl = dirname(dirname(__DIR__)) . '/tpl/model.tpl';
         $tplContent = file_get_contents($controllerTpl);
@@ -57,6 +57,10 @@ class ModelAutoMake implements IAutoMake
         $tplContent = str_replace('<table>', $table, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
-        file_put_contents(app_path('/') . $modelPath . DS . 'model' . DS . $model . '.php', $tplContent);
+        if (file_put_contents(app_path('/') . $modelPath . DS . 'model' . DS . $model . '.php', $tplContent)) {
+            $output->writeln("Generate app\{$namespace}\model\{$model}.php Success");
+        } else {
+            $output->writeln("Generate app\{$namespace}\model\{$model}.php Fail");
+        }
     }
 }

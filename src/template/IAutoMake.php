@@ -13,5 +13,5 @@ interface IAutoMake
 {
     public function check($flag, $modelPath, $controllerPath, $validatePath, OutputInterface $output);
 
-    public function make($flag, $modelPath, $controllerPath, $validatePath, $other);
+    public function make($flag, $modelPath, $controllerPath, $validatePath, $other, OutputInterface $output);
 }

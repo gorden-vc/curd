@@ -32,7 +32,7 @@ class ControllerAutoMake implements IAutoMake
         }
     }
 
-    public function make($controller, $modelPath, $controllerPath, $validatePath, $table)
+    public function make($controller, $modelPath, $controllerPath, $validatePath, $table, OutputInterface $output)
     {
         $controllerTpl = dirname(dirname(__DIR__)) . '/tpl/controller.tpl';
         $tplContent = file_get_contents($controllerTpl);
@@ -60,7 +60,11 @@ class ControllerAutoMake implements IAutoMake
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
-        file_put_contents(app_path('/') . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent);
+        if (file_put_contents(app_path('/') . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent)) {
+            $output->writeln("Generate app\{$namespace}\controller\{$controller}.php Success");
+        } else {
+            $output->writeln("Generate app\{$namespace}\controller\{$controller}.php Fail");
+        }
 
         // 检测base是否存在
 //        if (!file_exists(base_path() . $filePath . DS . 'controller' . DS . 'Base.php')) {
