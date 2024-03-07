@@ -15,15 +15,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ControllerAutoMake implements IAutoMake
 {
-    public function check($controller, $path, OutputInterface $output)
+    public function check($controller, $modelPath, $controllerPath, $validatePath, OutputInterface $output)
     {
         !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
         $controller = ucfirst($controller);
-        $controllerFilePath = app_path('/') . $path . DS . 'controller' . DS . $controller . '.php';
+        $controllerFilePath = app_path('/') . $controllerPath . DS . 'controller' . DS . $controller . '.php';
 
-        if (!is_dir(app_path('/') . $path . DS . 'controller')) {
-            mkdir(app_path('/') . $path . DS . 'controller', 0755, true);
+        if (!is_dir(app_path('/') . $controllerPath . DS . 'controller')) {
+            mkdir(app_path('/') . $controllerPath . DS . 'controller', 0755, true);
         }
 
         if (file_exists($controllerFilePath)) {
@@ -32,15 +32,16 @@ class ControllerAutoMake implements IAutoMake
         }
     }
 
-    public function make($controller, $path, $table)
+    public function make($controller, $modelPath, $controllerPath, $validatePath, $table)
     {
         $controllerTpl = dirname(dirname(__DIR__)) . '/tpl/controller.tpl';
         $tplContent = file_get_contents($controllerTpl);
 
         $controller = ucfirst($controller);
         $model = ucfirst(Utils::camelize($table));
-        $filePath = empty($path) ? '' : DS . $path;
-        $namespace = empty($path) ? '\\' : '\\' . $path . '\\';
+        $filePath = empty($controllerPath) ? '' : DS . $controllerPath;
+        $namespace = empty($controllerPath) ? '\\' : '\\' . $controllerPath . '\\';
+        $modelNamespace = empty($modelPath) ? '\\' : '\\' . $modelPath . '\\';
 
         $prefix = config('database.connections.mysql.prefix');
         $column = Db::select('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
@@ -54,6 +55,7 @@ class ControllerAutoMake implements IAutoMake
         }
 
         $tplContent = str_replace('<namespace>', $namespace, $tplContent);
+        $tplContent = str_replace('<modelNamespace>', $modelNamespace, $tplContent);
         $tplContent = str_replace('<controller>', $controller, $tplContent);
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);

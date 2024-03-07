@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 interface IAutoMake
 {
-    public function check($flag, $path, OutputInterface $output);
+    public function check($flag, $modelPath, $controllerPath, $validatePath, OutputInterface $output);
 
-    public function make($flag, $path, $other);
+    public function make($flag, $modelPath, $controllerPath, $validatePath, $other);
 }

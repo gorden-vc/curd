@@ -16,15 +16,15 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class ModelAutoMake implements IAutoMake
 {
-    public function check($table, $path, OutputInterface $output)
+    public function check($table, $modelPath, $controllerPath, $validatePath, OutputInterface $output)
     {
         !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
         $modelName = ucfirst(Utils::camelize($table));
-        $modelFilePath = app_path('/') . $path . DS . 'model' . DS . $modelName . '.php';
+        $modelFilePath = app_path('/') . $modelPath . DS . 'model' . DS . $modelName . '.php';
 
-        if (!is_dir(app_path('/') . $path . DS . 'model')) {
-            mkdir(app_path('/') . $path . DS . 'model', 0755, true);
+        if (!is_dir(app_path('/') . $modelPath . DS . 'model')) {
+            mkdir(app_path('/') . $modelPath . DS . 'model', 0755, true);
         }
 
         if (file_exists($modelFilePath)) {
@@ -33,14 +33,14 @@ class ModelAutoMake implements IAutoMake
         }
     }
 
-    public function make($table, $path, $other)
+    public function make($table, $modelPath, $controllerPath, $validatePath, $other)
     {
         $controllerTpl = dirname(dirname(__DIR__)) . '/tpl/model.tpl';
         $tplContent = file_get_contents($controllerTpl);
 
         $model = ucfirst(Utils::camelize($table));
-        $filePath = empty($path) ? '' : DS . $path;
-        $namespace = empty($path) ? '\\' : '\\' . $path . '\\';
+        $filePath = empty($modelPath) ? '' : DS . $modelPath;
+        $namespace = empty($modelPath) ? '\\' : '\\' . $modelPath . '\\';
 
         $prefix = config('database.connections.mysql.prefix');
         $column = Db::select('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');
@@ -56,6 +56,6 @@ class ModelAutoMake implements IAutoMake
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
-        file_put_contents(app_path('/') . $path . DS . 'model' . DS . $model . '.php', $tplContent);
+        file_put_contents(app_path('/') . $modelPath . DS . 'model' . DS . $model . '.php', $tplContent);
     }
 }

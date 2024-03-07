@@ -11,13 +11,13 @@ use support\Db;
 
 class ValidateAutoMake implements IAutoMake
 {
-    public function check($table, $path, OutputInterface $output)
+    public function check($table, $modelPath, $controllerPath, $validatePath, OutputInterface $output)
     {
         $validateName = Utils::camelize($table) . 'Validate';
-        $validateFilePath = app_path('/') . $path . DS . 'validate' . DS . $validateName . '.php';
+        $validateFilePath = app_path('/') . $validatePath . DS . 'validate' . DS . $validateName . '.php';
 
-        if (!is_dir(app_path('/') . $path . DS . 'validate')) {
-            mkdir(app_path('/') . $path . DS . 'validate', 0755, true);
+        if (!is_dir(app_path('/') . $validatePath . DS . 'validate')) {
+            mkdir(app_path('/') . $validatePath . DS . 'validate', 0755, true);
         }
 
         if (file_exists($validateFilePath)) {
@@ -26,14 +26,14 @@ class ValidateAutoMake implements IAutoMake
         }
     }
 
-    public function make($table, $path, $other)
+    public function make($table, $modelPath, $controllerPath, $validatePath, $other)
     {
         $validateTpl = dirname(dirname(__DIR__)) . '/tpl/validate.tpl';
         $tplContent = file_get_contents($validateTpl);
 
         $model = ucfirst(Utils::camelize($table));
-        $filePath = empty($path) ? '' : DS . $path;
-        $namespace = empty($path) ? '\\' : '\\' . $path . '\\';
+        $filePath = empty($validatePath) ? '' : DS . $validatePath;
+        $namespace = empty($validatePath) ? '\\' : '\\' . $validatePath . '\\';
 
         $prefix = config('database.connections.mysql.prefix');
         $column = Db::select('SHOW FULL COLUMNS FROM `' . $prefix . $table . '`');

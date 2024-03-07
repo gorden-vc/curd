@@ -50,10 +50,12 @@ class CurdCommand extends Command
         $controllerPath = $input->getOption('controller_path');
         if (!$controllerPath) {
             $controllerPath = '';
-        }$modelPath = $input->getOption('model_path');
+        }
+        $modelPath = $input->getOption('model_path');
         if (!$modelPath) {
             $modelPath = '';
-        }$validatePath = $input->getOption('validate_path');
+        }
+        $validatePath = $input->getOption('validate_path');
         if (!$validatePath) {
             $validatePath = '';
         }
@@ -62,15 +64,15 @@ class CurdCommand extends Command
 
         // 执行生成controller策略
         $context->Context(new ControllerAutoMake());
-        $context->executeStrategy($controller, $controllerPath, $table, $output);
+        $context->executeStrategy($controller, $modelPath, $controllerPath, $validatePath, $table, $output);
 
         // 执行生成model策略
         $context->Context(new ModelAutoMake());
-        $context->executeStrategy($table, $modelPath, '', $output);
+        $context->executeStrategy($table, $modelPath, $controllerPath, $validatePath, '', $output);
 
         // 执行生成validate策略
         $context->Context(new ValidateAutoMake());
-        $context->executeStrategy($table, $validatePath, '', $output);
+        $context->executeStrategy($table, $modelPath, $controllerPath, $validatePath, '', $output);
 
         $output->write("auto make curd success");
 
