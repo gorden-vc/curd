@@ -32,7 +32,7 @@ class BaseController
     /**
      * @var Validate
      */
-    protected $validateObj = null;
+    protected $validate = null;
 
     /**
      * 验证场景

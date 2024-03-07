@@ -35,7 +35,7 @@ class CurdController extends BaseController
     {
         try {
             $scene = $this->scene ?? 'insert';
-            if ($this->validateSwitch() && $this->validateObject()->scene($scene)->check($request->post())) {
+            if ($this->validateSwitch() && $this->validate()->scene($scene)->check($request->post())) {
                 throw new BusinessException($this->validate->getError());
             }
             $data = $this->inputFilter($request->post());
@@ -60,7 +60,7 @@ class CurdController extends BaseController
     {
         try {
             $scene = $this->scene ?? 'update';
-            if ($this->validateSeitch && !$this->validateObject()->scene($scene)->check($request->post())) {
+            if ($this->validateSeitch && !$this->validate()->scene($scene)->check($request->post())) {
                 return json_fail($this->validateClass->getError());
             }
             [$id, $data] = $this->updateInput($request);

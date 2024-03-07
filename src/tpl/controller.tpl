@@ -11,6 +11,6 @@ class <controller> extends CurdController
     public function __construct()
     {
         $this->model = new <model>();
-        $this->validateObject = new <model>Validate();
+        $this->validate = new <model>Validate();
     }
 }
