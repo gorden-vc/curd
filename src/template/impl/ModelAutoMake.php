@@ -27,10 +27,10 @@ class ModelAutoMake implements IAutoMake
             mkdir(app_path() . $path . DS . 'model', 0755, true);
         }
 
-//        if (file_exists($modelFilePath)) {
-//            $output->write("$modelName.php已经存在");
-//            exit;
-//        }
+        if (file_exists($modelFilePath)) {
+            $output->write("$modelName.php已经存在");
+            exit;
+        }
     }
 
     public function make($table, $path, $other)
@@ -56,7 +56,6 @@ class ModelAutoMake implements IAutoMake
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
-        dd(app_path() . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent);
         file_put_contents(app_path() . $path . DS . 'model' . DS . $model . '.php', $tplContent);
     }
 }

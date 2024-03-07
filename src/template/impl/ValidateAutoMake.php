@@ -20,10 +20,10 @@ class ValidateAutoMake implements IAutoMake
             mkdir(app_path() . $path . DS . 'validate', 0755, true);
         }
 
-//        if (file_exists($validateFilePath)) {
-//            $output->write("$validateName.php已经存在");
-//            exit;
-//        }
+        if (file_exists($validateFilePath)) {
+            $output->write("$validateName.php已经存在");
+            exit;
+        }
     }
 
     public function make($table, $path, $other)

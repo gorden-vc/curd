@@ -26,10 +26,10 @@ class ControllerAutoMake implements IAutoMake
             mkdir(app_path() . $path . DS . 'controller', 0755, true);
         }
 
-//        if (file_exists($controllerFilePath)) {
-//            $output->writeln("$controller.php已经存在");
-//            exit;
-//        }
+        if (file_exists($controllerFilePath)) {
+            $output->writeln("$controller.php已经存在");
+            exit;
+        }
     }
 
     public function make($controller, $path, $table)
