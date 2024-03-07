@@ -20,10 +20,10 @@ class ControllerAutoMake implements IAutoMake
         !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
         $controller = ucfirst($controller);
-        $controllerFilePath = app_path() . $path . DS . 'controller' . DS . $controller . '.php';
+        $controllerFilePath = app_path('/') . $path . DS . 'controller' . DS . $controller . '.php';
 
-        if (!is_dir(app_path() . $path . DS . 'controller')) {
-            mkdir(app_path() . $path . DS . 'controller', 0755, true);
+        if (!is_dir(app_path('/') . $path . DS . 'controller')) {
+            mkdir(app_path('/') . $path . DS . 'controller', 0755, true);
         }
 
         if (file_exists($controllerFilePath)) {
@@ -58,7 +58,7 @@ class ControllerAutoMake implements IAutoMake
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
-        file_put_contents(app_path() . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent);
+        file_put_contents(app_path('/') . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent);
 
         // 检测base是否存在
 //        if (!file_exists(base_path() . $filePath . DS . 'controller' . DS . 'Base.php')) {

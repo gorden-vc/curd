@@ -21,10 +21,10 @@ class ModelAutoMake implements IAutoMake
         !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
         $modelName = ucfirst(Utils::camelize($table));
-        $modelFilePath = app_path() . $path . DS . 'model' . DS . $modelName . '.php';
+        $modelFilePath = app_path('/') . $path . DS . 'model' . DS . $modelName . '.php';
 
-        if (!is_dir(app_path() . $path . DS . 'model')) {
-            mkdir(app_path() . $path . DS . 'model', 0755, true);
+        if (!is_dir(app_path('/') . $path . DS . 'model')) {
+            mkdir(app_path('/') . $path . DS . 'model', 0755, true);
         }
 
         if (file_exists($modelFilePath)) {
@@ -56,6 +56,6 @@ class ModelAutoMake implements IAutoMake
         $tplContent = str_replace('<model>', $model, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
-        file_put_contents(app_path() . $path . DS . 'model' . DS . $model . '.php', $tplContent);
+        file_put_contents(app_path('/') . $path . DS . 'model' . DS . $model . '.php', $tplContent);
     }
 }

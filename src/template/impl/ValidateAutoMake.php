@@ -14,10 +14,10 @@ class ValidateAutoMake implements IAutoMake
     public function check($table, $path, OutputInterface $output)
     {
         $validateName = Utils::camelize($table) . 'Validate';
-        $validateFilePath = app_path() . $path . DS . 'validate' . DS . $validateName . '.php';
+        $validateFilePath = app_path('/') . $path . DS . 'validate' . DS . $validateName . '.php';
 
-        if (!is_dir(app_path() . $path . DS . 'validate')) {
-            mkdir(app_path() . $path . DS . 'validate', 0755, true);
+        if (!is_dir(app_path('/') . $path . DS . 'validate')) {
+            mkdir(app_path('/') . $path . DS . 'validate', 0755, true);
         }
 
         if (file_exists($validateFilePath)) {
@@ -54,6 +54,6 @@ class ValidateAutoMake implements IAutoMake
         $tplContent = str_replace('<rule>', '' . $ruleArr, $tplContent);
         $tplContent = str_replace('<scene>', $sceneArr, $tplContent);
 
-        file_put_contents(app_path() . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent);
+        file_put_contents(app_path('/') . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent);
     }
 }
