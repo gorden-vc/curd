@@ -2,7 +2,7 @@
 
 namespace app<namespace>model;
 
-use think\model;
+use support\Model;
 
 class <model> extends Model
 {
