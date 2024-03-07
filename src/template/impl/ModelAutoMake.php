@@ -54,6 +54,7 @@ class ModelAutoMake implements IAutoMake
 
         $tplContent = str_replace('<namespace>', $namespace, $tplContent);
         $tplContent = str_replace('<model>', $model, $tplContent);
+        $tplContent = str_replace('<table>', $table, $tplContent);
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
         file_put_contents(app_path('/') . $modelPath . DS . 'model' . DS . $model . '.php', $tplContent);
