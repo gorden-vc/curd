@@ -16,13 +16,13 @@ class BaseController
      * 不需要登录的方法
      * @var string[]
      */
-    protected $noNeedLogin = ['login', 'captcha'];
+    protected $noNeedLogin = [];
 
     /**
      * 不需要鉴权的方法
      * @var string[]
      */
-    protected $noNeedAuth = ['info'];
+    protected $noNeedAuth = [];
 
     /**
      * @var Model
