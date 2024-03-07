@@ -22,6 +22,6 @@ class AutoMakeStrategy
     public function executeStrategy($flag, $modelPath, $controllerPath, $validatePath, $other, OutputInterface $output)
     {
         $this->strategy->check($flag, $modelPath, $controllerPath, $validatePath, $output);
-        $this->strategy->make($flag, $modelPath, $controllerPath, $validatePath, $other,OutputInterface $output);
+        $this->strategy->make($flag, $modelPath, $controllerPath, $validatePath, $other, $output);
     }
 }
