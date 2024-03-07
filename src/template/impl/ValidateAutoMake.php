@@ -55,9 +55,9 @@ class ValidateAutoMake implements IAutoMake
         $tplContent = str_replace('<scene>', $sceneArr, $tplContent);
 
         if (file_put_contents(app_path('/') . $filePath . DS . 'validate' . DS . $model . 'Validate.php', $tplContent)) {
-            $output->writeln("Generate app\{$namespace}\\validate\{$model}Validate.php Success");
+            $output->writeln("Generate app".$namespace."validate\\".$model."Validate.php Success");
         } else {
-            $output->writeln("Generate app\{$namespace}\\validate\{$model}Validate.php Fail");
+            $output->writeln("Generate app".$namespace."validate\\".$model."Validate.php Fail");
         }
     }
 }

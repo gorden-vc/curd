@@ -58,9 +58,9 @@ class ModelAutoMake implements IAutoMake
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
         if (file_put_contents(app_path('/') . $modelPath . DS . 'model' . DS . $model . '.php', $tplContent)) {
-            $output->writeln("Generate app\{$namespace}\model\{$model}.php Success");
+            $output->writeln("Generate app".$namespace."model\\".$model.".php Success");
         } else {
-            $output->writeln("Generate app\{$namespace}\model\{$model}.php Fail");
+            $output->writeln("Generate app".$namespace."model\\".$model.".php Fail");
         }
     }
 }

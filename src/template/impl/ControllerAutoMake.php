@@ -61,9 +61,9 @@ class ControllerAutoMake implements IAutoMake
         $tplContent = str_replace('<pk>', $pk, $tplContent);
 
         if (file_put_contents(app_path('/') . $filePath . DS . 'controller' . DS . $controller . '.php', $tplContent)) {
-            $output->writeln("Generate app\{$namespace}\controller\{$controller}.php Success");
+            $output->writeln("Generate app".$namespace."controller\\".$controller.".php Success");
         } else {
-            $output->writeln("Generate app\{$namespace}\controller\{$controller}.php Fail");
+            $output->writeln("Generate app".$namespace."controller\\".$controller.".php Fail");
         }
 
         // 检测base是否存在
